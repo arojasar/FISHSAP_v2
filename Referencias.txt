@@ -1,0 +1,21 @@
+library(RPostgres)
+conn <- dbConnect(RPostgres::Postgres(),
+                  host = "ep-lingering-mountain-a4d7nbm3-pooler.us-east-1.aws.neon.tech",
+                  port = 5432,
+                  dbname = "neondb",
+                  user = "neondb_owner",
+                  password = "npg_qAo6YIQRUT4z",
+                  sslmode = "require")
+dbDisconnect(conn)
+
+
+library(RPostgres)
+conn <- dbConnect(RPostgres::Postgres(),
+                  host = "ep-lingering-mountain-a4d7nbm3-pooler.us-east-1.aws.neon.tech",
+                  port = 5432,
+                  dbname = "neondb",
+                  user = "neondb_owner",
+                  password = "npg_qAo6YIQRUT4z",
+                  sslmode = "require")
+dbGetQuery(conn, "SELECT * FROM subgrupo")
+dbDisconnect(conn)
