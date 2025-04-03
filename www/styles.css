@@ -1,0 +1,609 @@
+/* www/styles.css - Versión mejorada */
+
+/* Variables de colores para mantener consistencia */
+:root {
+  --primary-color: #1abc9c;
+  --primary-dark: #16a085;
+  --secondary-color: #2c3e50;
+  --secondary-dark: #34495e;
+  --light-color: #ecf0f1;
+  --border-color: #dcdcdc;
+  --background-color: #f4f7fa;
+  --hover-color: #f1f1f1;
+  --shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Estilo general para el cuerpo de la aplicación */
+body {
+  font-family: 'Arial', sans-serif;
+  background-color: var(--background-color);
+  color: var(--secondary-dark);
+  line-height: 1.6;
+}
+
+/* Estilo para los encabezados */
+h2, h3 {
+  color: var(--secondary-color);
+  margin-bottom: 20px;
+  font-weight: 600;
+}
+
+h2 {
+  font-size: 24px;
+  border-bottom: 2px solid var(--primary-color);
+  padding-bottom: 10px;
+}
+
+h3 {
+  font-size: 20px;
+}
+
+/* Estilo para la barra lateral */
+.sidebar {
+  background-color: var(--secondary-color);
+}
+
+.main-header .logo {
+  background-color: var(--secondary-dark);
+  color: var(--light-color);
+  font-weight: bold;
+  font-size: 20px;
+}
+
+.main-header .navbar {
+  background-color: var(--secondary-color);
+}
+
+.sidebar-menu > li > a {
+  padding: 12px 15px;
+  color: var(--light-color);
+  font-size: 15px;
+  border-left: 3px solid transparent;
+}
+
+.sidebar-menu > li.active > a,
+.sidebar-menu > li:hover > a {
+  background-color: var(--secondary-dark);
+  border-left-color: var(--primary-color);
+}
+
+.sidebar-menu .treeview-menu {
+  background-color: var(--secondary-dark);
+  padding-left: 5px;
+}
+
+.sidebar-menu .treeview-menu li a {
+  color: var(--light-color);
+  padding: 10px 15px 10px 25px;
+  font-size: 14px;
+  border-left: 2px solid transparent;
+}
+
+.sidebar-menu .treeview-menu li a:hover,
+.sidebar-menu .treeview-menu li.active a {
+  background-color: var(--primary-color);
+  color: #fff;
+  border-left-color: #fff;
+}
+
+/* Estilo para el contenedor del formulario */
+.dynamic-form-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border-color);
+  transition: box-shadow 0.3s ease;
+}
+
+.dynamic-form-container:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Estilo para los campos del formulario */
+.form-group {
+  margin-bottom: 20px;
+}
+
+.control-label {
+  font-weight: bold;
+  margin-bottom: 8px;
+  display: block;
+  color: var(--secondary-dark);
+  font-size: 14px;
+}
+
+.form-control {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-size: 14px;
+  background-color: #f9f9f9;
+  transition: all 0.3s ease;
+}
+
+.form-control:focus {
+  border-color: var(--primary-color);
+  outline: none;
+  box-shadow: 0 0 5px rgba(26, 188, 156, 0.3);
+  background-color: #fff;
+}
+
+/* Estilo específico para select múltiple */
+.selectize-input {
+  padding: 8px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+}
+
+.selectize-input.focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 5px rgba(26, 188, 156, 0.3);
+}
+
+.selectize-dropdown {
+  border: 1px solid var(--border-color);
+  border-radius: 0 0 4px 4px;
+}
+
+.selectize-dropdown-content .option {
+  padding: 8px 12px;
+}
+
+.selectize-dropdown-content .option.active {
+  background-color: var(--primary-color);
+  color: #fff;
+}
+
+/* Estilo para los botones */
+.btn {
+  padding: 10px 20px;
+  font-size: 16px;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.btn-primary {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-dark);
+  border-color: var(--primary-dark);
+}
+
+.btn-primary:active {
+  box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.2);
+}
+
+.btn-info {
+  background-color: #3498db;
+  border-color: #3498db;
+  color: #fff;
+}
+
+.btn-info:hover {
+  background-color: #2980b9;
+  border-color: #2980b9;
+}
+
+.btn-danger {
+  background-color: #e74c3c;
+  border-color: #e74c3c;
+  color: #fff;
+}
+
+.btn-danger:hover {
+  background-color: #c0392b;
+  border-color: #c0392b;
+}
+
+/* Estilo para la tabla */
+.dataTables_wrapper {
+  margin-top: 20px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+  padding: 20px;
+  border: 1px solid var(--border-color);
+}
+
+table.dataTable {
+  width: 100% !important;
+  border-collapse: collapse;
+  display: table !important;
+  visibility: visible !important;
+  margin-top: 15px !important;
+  margin-bottom: 15px !important;
+}
+
+/* Encabezados de la tabla */
+table.dataTable thead th {
+  background-color: var(--secondary-dark);
+  color: var(--light-color);
+  padding: 12px;
+  font-size: 14px;
+  border-bottom: 2px solid var(--secondary-color);
+  text-align: left;
+  vertical-align: middle;
+}
+
+/* Mejorar el aspecto de las celdas con botones */
+table.dataTable thead th button.dt-button {
+  background-color: transparent;
+  border: none;
+  color: var(--light-color);
+  cursor: pointer;
+}
+
+/* Celdas de la tabla */
+table.dataTable tbody td {
+  padding: 12px;
+  border-bottom: 1px solid var(--border-color);
+  font-size: 14px;
+  color: var(--secondary-dark);
+  vertical-align: middle;
+}
+
+/* Efecto hover en las filas */
+table.dataTable tbody tr:hover {
+  background-color: var(--hover-color);
+}
+
+/* Alternar colores de filas */
+table.dataTable.stripe tbody tr.odd {
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+/* Estilo para los controles de la tabla */
+.dataTables_length,
+.dataTables_filter {
+  margin-bottom: 15px;
+  font-size: 14px;
+}
+
+.dataTables_length select {
+  padding: 5px 8px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  background-color: #fff;
+}
+
+.dataTables_filter input {
+  padding: 8px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  margin-left: 10px;
+  width: 200px;
+}
+
+/* Paginación */
+.dataTables_paginate {
+  margin-top: 15px;
+}
+
+.paginate_button {
+  padding: 8px 12px !important;
+  margin: 0 2px !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: 4px !important;
+  background-color: #ffffff !important;
+  color: var(--secondary-dark) !important;
+  cursor: pointer !important;
+}
+
+.paginate_button:hover {
+  background-color: var(--primary-color) !important;
+  color: #fff !important;
+  border-color: var(--primary-color) !important;
+}
+
+.paginate_button.current {
+  background-color: var(--primary-color) !important;
+  color: #fff !important;
+  border-color: var(--primary-color) !important;
+}
+
+.paginate_button.disabled {
+  opacity: 0.5;
+  cursor: default !important;
+}
+
+.paginate_button.disabled:hover {
+  background-color: #ffffff !important;
+  color: var(--secondary-dark) !important;
+  border-color: var(--border-color) !important;
+}
+
+/* Estilo para las notificaciones */
+.shiny-notification {
+  background-color: var(--primary-color);
+  color: #fff;
+  border-radius: 4px;
+  padding: 15px;
+  font-size: 16px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  border: none;
+}
+
+.shiny-notification.warning {
+  background-color: #f39c12;
+}
+
+.shiny-notification.error {
+  background-color: #e74c3c;
+}
+
+/* Estilo para el contenedor principal */
+.content-wrapper {
+  background-color: var(--background-color);
+  padding: 20px;
+}
+
+.tab-content {
+  padding: 20px 0;
+}
+
+/* Estilos para la página de inicio */
+.welcome-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 30px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border-color);
+  animation: fadeIn 0.6s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.welcome-title {
+  text-align: center;
+  color: var(--primary-color);
+  font-size: 32px;
+  margin-bottom: 30px;
+  position: relative;
+  padding-bottom: 15px;
+}
+
+.welcome-title:after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 3px;
+  background-color: var(--primary-color);
+}
+
+.welcome-container p {
+  font-size: 16px;
+  line-height: 1.7;
+  color: var(--secondary-dark);
+  margin-bottom: 15px;
+}
+
+.welcome-container h3 {
+  color: var(--secondary-color);
+  font-size: 22px;
+  margin-top: 25px;
+  margin-bottom: 15px;
+  font-weight: 600;
+}
+
+.welcome-container ul {
+  list-style-type: none;
+  margin-left: 10px;
+  font-size: 16px;
+  color: var(--secondary-dark);
+}
+
+.welcome-container li {
+  margin-bottom: 12px;
+  position: relative;
+  padding-left: 25px;
+}
+
+.welcome-container li:before {
+  content: '•';
+  color: var(--primary-color);
+  font-size: 22px;
+  position: absolute;
+  left: 0;
+  top: -2px;
+}
+
+/* Estilo para los campos de texto no editables */
+.non-editable-field {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-size: 14px;
+  background-color: #f0f0f0;
+  color: var(--secondary-dark);
+  display: inline-block;
+  min-height: 34px;
+  line-height: 1.5;
+  cursor: not-allowed;
+}
+
+/* Estilo para tooltips e información adicional */
+.help-block {
+  font-size: 12px;
+  color: #777;
+  margin-top: 5px;
+}
+
+/* Mejoras visuales para los módulos específicos */
+/* Módulo de captura y esfuerzo */
+.capture-module-container {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+  padding: 20px;
+  margin-bottom: 20px;
+  border: 1px solid var(--border-color);
+}
+
+.capture-module-title {
+  color: var(--primary-color);
+  font-size: 18px;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+/* Módulo de actividad diaria */
+.activity-module-container {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+  padding: 20px;
+  margin-bottom: 20px;
+  border: 1px solid var(--border-color);
+}
+
+.activity-module-title {
+  color: var(--primary-color);
+  font-size: 18px;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+/* Separadores para formularios largos */
+.form-section-divider {
+  border-top: 1px solid var(--border-color);
+  margin: 25px 0;
+  position: relative;
+}
+
+.form-section-divider::after {
+  content: attr(data-title);
+  position: absolute;
+  top: -10px;
+  left: 20px;
+  background-color: #fff;
+  padding: 0 10px;
+  font-size: 14px;
+  color: var(--primary-color);
+  font-weight: bold;
+}
+
+/* Estilos responsivos */
+@media (max-width: 768px) {
+  .dynamic-form-container {
+    max-width: 100%;
+    padding: 15px;
+  }
+  
+  .welcome-container {
+    padding: 20px;
+    max-width: 100%;
+  }
+  
+  .welcome-title {
+    font-size: 24px;
+  }
+  
+  table.dataTable thead th,
+  table.dataTable tbody td {
+    padding: 8px;
+    font-size: 12px;
+  }
+  
+  .dataTables_filter input {
+    width: 150px;
+  }
+}
+
+/* Mejorar la visibilidad de elementos activos */
+input:focus, textarea:focus, select:focus, .selectize-input.focus {
+  border-color: var(--primary-color) !important;
+  box-shadow: 0 0 0 3px rgba(26, 188, 156, 0.25) !important;
+}
+
+/* Efectos de carga */
+.loading-spinner {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(26, 188, 156, 0.3);
+  border-radius: 50%;
+  border-top-color: var(--primary-color);
+  animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Estilos para mensajes de validación */
+.validation-error {
+  color: #e74c3c;
+  font-size: 12px;
+  margin-top: 5px;
+  display: block;
+}
+
+.validation-success {
+  color: var(--primary-color);
+  font-size: 12px;
+  margin-top: 5px;
+  display: block;
+}
+
+/* Estilos para tarjetas de resumen */
+.summary-card {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+  padding: 20px;
+  margin-bottom: 20px;
+  border-left: 4px solid var(--primary-color);
+}
+
+.summary-card-title {
+  font-size: 18px;
+  margin-bottom: 10px;
+  color: var(--secondary-color);
+  font-weight: 600;
+}
+
+.summary-card-value {
+  font-size: 24px;
+  color: var(--primary-color);
+  font-weight: bold;
+}
+
+.summary-card-subtitle {
+  font-size: 14px;
+  color: #777;
+  margin-top: 5px;
+}
+
+/* Estilos para tablas más densas cuando hay muchos datos */
+.compact-table thead th,
+.compact-table tbody td {
+  padding: 6px 8px;
+  font-size: 13px;
+}
+
+.compact-table .dataTables_length,
+.compact-table .dataTables_filter,
+.compact-table .dataTables_info,
+.compact-table .dataTables_paginate {
+  font-size: 13px;
+}

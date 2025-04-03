@@ -1,93 +1,138 @@
+# ui.R
 library(shiny)
 library(shinydashboard)
+library(bslib)
 
 ui <- dashboardPage(
-  dashboardHeader(title = "SIPEIN"),
+  dashboardHeader(title = "FISHSAP"),
   dashboardSidebar(
-    sidebarMenu(id = "sidebar",
-                menuItem("Inicio", tabName = "principal", icon = icon("home")),
-                menuItem("Tablas de Referencia", icon = icon("table"),
-                         menuSubItem("Sitios de Desembarque", tabName = "sitios"),
-                         menuSubItem("Especies Comerciales", tabName = "especies"),
-                         menuSubItem("Categorias de Estado", tabName = "estados"),
-                         menuSubItem("Clasificación", tabName = "clasifica"),
-                         menuSubItem("Grupos", tabName = "grupos"),
-                         menuSubItem("Subgrupo", tabName = "subgrupo"),
-                         menuSubItem("Arte de Pesca", tabName = "arte"),
-                         menuSubItem("Método de Pesca", tabName = "metodo"),
-                         menuSubItem("Propulsión", tabName = "propulsion"),
-                         menuSubItem("Área de Pesca", tabName = "area"),
-                         menuSubItem("Subárea de Pesca", tabName = "subarea"),
-                         menuSubItem("Registrador de Campo", tabName = "registrador"),
-                         menuSubItem("Embarcaciones", tabName = "embarcaciones"),
-                         menuSubItem("Gastos de Faena", tabName = "gastos"),
-                         menuSubItem("Valor Mensual Gastos", tabName = "valor_mensual_gastos"),
-                         menuSubItem("TRM Dólar", tabName = "trm_dolar")
-                ),
-                menuItem("Ingreso de Datos", icon = icon("upload"),
-                         menuSubItem("Faena Principal", tabName = "faena_principal")
-                )
-                # Aquí puedes añadir más menuItem si tienes otras secciones
+    sidebarMenu(
+      id = "sidebar",
+      menuItem("Inicio", tabName = "inicio", icon = icon("home"), selected = TRUE),
+      menuItem("Tablas de Referencia", tabName = "tablas_referencia", icon = icon("table"),
+               menuSubItem("Sitios de Desembarque", tabName = "sitios"),
+               menuSubItem("Especies Comerciales", tabName = "especies"),
+               menuSubItem("Categorías de Estado", tabName = "estados"),
+               menuSubItem("Clasificación", tabName = "clasifica"),
+               menuSubItem("Grupos", tabName = "grupos"),
+               menuSubItem("Subgrupo", tabName = "subgrupo"),
+               menuSubItem("Arte de Pesca", tabName = "arte"),
+               menuSubItem("Método de Pesca", tabName = "metodo"),
+               menuSubItem("Propulsión", tabName = "propulsion"),
+               menuSubItem("Área de Pesca", tabName = "area"),
+               menuSubItem("Subárea de Pesca", tabName = "subarea"),
+               menuSubItem("Registrador de Campo", tabName = "registrador"),
+               menuSubItem("Embarcaciones", tabName = "embarcaciones"),
+               menuSubItem("Gastos", tabName = "gastos"),
+               menuSubItem("Valor Mensual Gastos", tabName = "valor_mensual_gastos"),
+               menuSubItem("TRM Dólar", tabName = "trm_dolar"),
+               menuSubItem("Clases de Medida", tabName = "clases_medida"),
+               menuSubItem("Nombre del Pescador", tabName = "nombre_pescador")
+      ),
+      menuItem("Ingreso de Datos", tabName = "principal", icon = icon("edit"),
+               menuSubItem("Captura y Esfuerzo", tabName = "captura_esfuerzo"),
+               menuSubItem("Actividad Diaria", tabName = "actividad_diaria")
+      )
     )
   ),
   dashboardBody(
+    includeCSS("www/styles.css"),
     tabItems(
       tabItem(tabName = "inicio",
-              h2("Sistema de Información Pesquera - SIPEIN"),
-              p("Bienvenido al SIPEIN. Esta aplicación permite gestionar información sobre la actividad pesquera."),
-              p("Seleccione una opción en el menú lateral para comenzar.")
+              h2("Bienvenido a FISHSAP", class = "welcome-title"),
+              div(class = "welcome-container",
+                  p("FISHSAP es una aplicación diseñada para la captura, almacenamiento y procesamiento de datos de desembarque pesquero en el Archipiélago de San Andrés. Aquí podrás gestionar información clave sobre especies comerciales, sitios de desembarque, y más, de manera eficiente y organizada."),
+                  h3("¿Cómo empezar?"),
+                  p("Utiliza el menú lateral para navegar entre las diferentes secciones:"),
+                  tags$ul(
+                    tags$li("Tablas de Referencia: Gestiona los datos maestros como sitios, especies, y categorías."),
+                    tags$li("Ingreso de Datos: Registra la información de las faenas pesqueras y actividades diarias.")
+                  ),
+                  h3("Acerca de"),
+                  p("Desarrollado para apoyar la gestión pesquera sostenible en el Archipiélago de San Andrés. Si tienes preguntas o necesitas soporte, contacta al equipo de desarrollo.")
+              )
       ),
+      # Tablas de referencia
       tabItem(tabName = "sitios",
-              ref_tables_ui("ref_tables")
+              h2("Sitios de Desembarque"),
+              ref_tables_ui("ref_tables_sitios", ref_tables_fields)
       ),
       tabItem(tabName = "especies",
-              ref_tables_ui("ref_tables")
+              h2("Especies Comerciales"),
+              ref_tables_ui("ref_tables_especies", ref_tables_fields)
       ),
       tabItem(tabName = "estados",
-              ref_tables_ui("ref_tables")
+              h2("Categorías de Estado"),
+              ref_tables_ui("ref_tables_estados", ref_tables_fields)
       ),
       tabItem(tabName = "clasifica",
-              ref_tables_ui("ref_tables")
+              h2("Clasificación"),
+              ref_tables_ui("ref_tables_clasifica", ref_tables_fields)
       ),
       tabItem(tabName = "grupos",
-              ref_tables_ui("ref_tables")
+              h2("Grupos"),
+              ref_tables_ui("ref_tables_grupos", ref_tables_fields)
       ),
       tabItem(tabName = "subgrupo",
-              ref_tables_ui("ref_tables")
+              h2("Subgrupo"),
+              ref_tables_ui("ref_tables_subgrupo", ref_tables_fields)
       ),
       tabItem(tabName = "arte",
-              ref_tables_ui("ref_tables")
+              h2("Arte de Pesca"),
+              ref_tables_ui("ref_tables_arte", ref_tables_fields)
       ),
       tabItem(tabName = "metodo",
-              ref_tables_ui("ref_tables")
+              h2("Método de Pesca"),
+              ref_tables_ui("ref_tables_metodo", ref_tables_fields)
       ),
       tabItem(tabName = "propulsion",
-              ref_tables_ui("ref_tables")
+              h2("Propulsión"),
+              ref_tables_ui("ref_tables_propulsion", ref_tables_fields)
       ),
       tabItem(tabName = "area",
-              ref_tables_ui("ref_tables")
+              h2("Área de Pesca"),
+              ref_tables_ui("ref_tables_area", ref_tables_fields)
       ),
       tabItem(tabName = "subarea",
-              ref_tables_ui("ref_tables")
+              h2("Subárea de Pesca"),
+              ref_tables_ui("ref_tables_subarea", ref_tables_fields)
       ),
       tabItem(tabName = "registrador",
-              ref_tables_ui("ref_tables")
+              h2("Registrador de Campo"),
+              ref_tables_ui("ref_tables_registrador", ref_tables_fields)
       ),
       tabItem(tabName = "embarcaciones",
-              ref_tables_ui("ref_tables")
+              h2("Embarcaciones"),
+              ref_tables_ui("ref_tables_embarcaciones", ref_tables_fields)
       ),
       tabItem(tabName = "gastos",
-              ref_tables_ui("ref_tables")
+              h2("Gastos"),
+              ref_tables_ui("ref_tables_gastos", ref_tables_fields)
       ),
       tabItem(tabName = "valor_mensual_gastos",
-              ref_tables_ui("ref_tables")
+              h2("Valor Mensual Gastos"),
+              ref_tables_ui("ref_tables_valor_mensual_gastos", ref_tables_fields)
       ),
       tabItem(tabName = "trm_dolar",
-              ref_tables_ui("ref_tables")
+              h2("TRM Dólar"),
+              ref_tables_ui("ref_tables_trm_dolar", ref_tables_fields)
       ),
-      tabItem(tabName = "ingreso_faena",
-              h2("Ingreso de Datos de Faena Principal"),
-              ingreso_datos_faena_ui("ingreso_datos_faena")
+      tabItem(tabName = "clases_medida",
+              h2("Clases de Medida"),
+              ref_tables_ui("ref_tables_clases_medida", ref_tables_fields)
+      ),
+      tabItem(tabName = "nombre_pescador",
+              h2("Nombre del Pescador"),
+              ref_tables_ui("ref_tables_nombre_pescador", ref_tables_fields)
+      ),
+      # Módulos de ingreso de datos
+      tabItem(tabName = "captura_esfuerzo",
+              h2("Captura y Esfuerzo"),
+              captura_esfuerzo_ui("captura_esfuerzo")
+      ),
+      tabItem(tabName = "actividad_diaria",
+              h2("Registro de Actividad Diaria"),
+              actividad_diaria_ui("actividad_diaria")
       )
     )
   )
