@@ -1,5 +1,6 @@
 # global.R
 
+# Cargar paquetes necesarios
 library(shiny)
 library(shinydashboard)
 library(DT)
@@ -10,7 +11,12 @@ library(jsonlite)
 library(shinyTime)
 library(dplyr)
 library(bslib)
+library(openxlsx)  # Para descargas en Excel
+library(shinyWidgets)  # Para componentes adicionales en la UI
+library(shinyjs)  # Para funcionalidades de JavaScript
+library(plotly)  # Para gráficos interactivos (opcional, para el módulo Procesamiento de Datos)
 
+# Cargar funciones de utilidad
 source("utils/db_setup.R", local = TRUE)
 source("utils/server_utils.R", local = TRUE)
 
@@ -52,10 +58,14 @@ if (is.null(pool)) {
   stop("No se pudo crear el pool de conexiones a la base de datos.")
 }
 
-# Cerrar el pool cuando la aplicación se detiene
+# Cerrar el pool cuando la aplicación se detenga (con manejo de errores)
 onStop(function() {
-  poolClose(pool)
-  message("Pool de conexiones cerrado.")
+  if (!is.null(pool) && pool::dbIsValid(pool)) {
+    poolClose(pool)
+    message("Pool de conexiones cerrado.")
+  } else {
+    message("El pool ya estaba cerrado o no era válido.")
+  }
 })
 
 # Ejecutar setup_databases para crear/verificar tablas necesarias
@@ -75,28 +85,29 @@ tryCatch({
 
 # Definición de los campos para las listas desplegables
 captura_esfuerzo_fields <- list(
-  list(id = "sitio_desembarque", label = "Sitio de Desembarque", type = "select", ref_table = "sitios", value_field = "CODSIT", display_field = "NOMSIT"),
-  list(id = "subarea", label = "Subárea", type = "select", ref_table = "subarea", value_field = "CODSUBARE", display_field = "NOMSUBARE"),
-  list(id = "registrador", label = "Registrador", type = "select", ref_table = "registrador", value_field = "CODREG", display_field = "NOMREG"),
-  list(id = "pescadores", label = "Nombre del Pescador", type = "select", ref_table = "nombre_pescador", value_field = "CODPES", display_field = "NOMPES", multiple = TRUE),
-  list(id = "embarcacion", label = "Embarcación", type = "select", ref_table = "embarcaciones", value_field = "CODEMB", display_field = "NOMEMB"),
-  list(id = "propulsion", label = "Propulsión", type = "select", ref_table = "propulsion", value_field = "CODPRO", display_field = "NOMPRO"),
-  list(id = "arte_pesca", label = "Arte de Pesca", type = "select", ref_table = "arte", value_field = "CODART", display_field = "NOMART"),
-  list(id = "metodo_pesca", label = "Método de Pesca", type = "select", ref_table = "metodo", value_field = "CODMET", display_field = "NOMMET", multiple = TRUE),
-  list(id = "especie", label = "Especie", type = "select", ref_table = "especies", value_field = "CODESP", display_field = "Nombre_Comun"),
-  list(id = "estado", label = "Estado", type = "select", ref_table = "estados", value_field = "CODEST", display_field = "NOMEST"),
-  list(id = "gasto", label = "Gasto", type = "select", ref_table = "gastos", value_field = "CODGAS", display_field = "NOMGAS"),
+  list(id = "sitio_desembarque", label = "Sitio de Desembarque", type = "select", ref_table = "sitios", value_field = "codsit", display_field = "nomsit"),
+  list(id = "subarea", label = "Subárea", type = "select", ref_table = "subarea", value_field = "codsubare", display_field = "nomsubare"),
+  list(id = "registrador", label = "Registrador", type = "select", ref_table = "registrador", value_field = "codreg", display_field = "nomreg"),
+  list(id = "pescadores", label = "Nombre del Pescador", type = "select", ref_table = "nombre_pescador", value_field = "codpes", display_field = "nompes", multiple = TRUE),
+  list(id = "embarcacion", label = "Embarcación", type = "select", ref_table = "embarcaciones", value_field = "codemb", display_field = "nomemb"),
+  list(id = "propulsion", label = "Propulsión", type = "select", ref_table = "propulsion", value_field = "codpro", display_field = "nompro"),
+  list(id = "arte_pesca", label = "Arte de Pesca", type = "select", ref_table = "arte", value_field = "codart", display_field = "nomart"),
+  list(id = "metodo_pesca", label = "Método de Pesca", type = "select", ref_table = "metodo", value_field = "codmet", display_field = "nommet", multiple = TRUE),
+  list(id = "especie", label = "Especie", type = "select", ref_table = "especies", value_field = "codesp", display_field = "nombre_comun"),
+  list(id = "estado", label = "Estado", type = "select", ref_table = "estados", value_field = "codest", display_field = "nomest"),
+  list(id = "gasto", label = "Gasto", type = "select", ref_table = "gastos", value_field = "codgas", display_field = "nomgas"),
   list(id = "horario", label = "Horario", type = "select", choices = c("Diurno", "Nocturno"))
 )
 
 # Función para cargar opciones de referencia con manejo de errores mejorado
 load_reference_choices <- function(field) {
   if (is.null(field$ref_table)) {
+    message("Campo sin tabla de referencia: ", field$id, " - Usando choices predefinidos")
     return(field$choices)
   }
   
   query <- sprintf("SELECT %s, %s FROM %s", field$value_field, field$display_field, field$ref_table)
-  message("Ejecutando consulta: ", query)
+  message("Ejecutando consulta para ", field$ref_table, ": ", query)
   
   data <- tryCatch({
     result <- dbGetQuery(pool, query)
@@ -111,20 +122,30 @@ load_reference_choices <- function(field) {
   })
   
   colnames(data) <- c("value", "display")
-  setNames(data$value, data$display)
+  result <- setNames(data$value, data$display)
+  message("Resultado de la consulta para ", field$ref_table, ": ", paste(capture.output(str(result)), collapse = "\n"))
+  result
 }
 
 # Cargar las opciones para las listas desplegables
+message("Cargando captura_esfuerzo_choices...")
 captura_esfuerzo_choices <- lapply(captura_esfuerzo_fields, load_reference_choices)
 names(captura_esfuerzo_choices) <- sapply(captura_esfuerzo_fields, function(field) field$id)
+message("Contenido de captura_esfuerzo_choices: ", paste(capture.output(str(captura_esfuerzo_choices)), collapse = "\n"))
 
-# También cargamos opciones específicas para el módulo de actividad diaria
+# Cargar opciones específicas para el módulo de actividad diaria
+message("Cargando opciones para actividad diaria...")
 registrador_choices <- tryCatch({
-  query <- "SELECT CODREG, NOMREG FROM registrador"
+  query <- "SELECT codreg, nomreg FROM registrador ORDER BY nomreg"
+  message("Ejecutando consulta para registrador: ", query)
   data <- dbGetQuery(pool, query)
+  message("Datos obtenidos para registrador: ", paste(capture.output(str(data)), collapse = "\n"))
   if (nrow(data) > 0) {
-    setNames(data$CODREG, data$NOMREG)
+    result <- setNames(data$codreg, data$nomreg)
+    message("Contenido de registrador_choices: ", paste(capture.output(str(result)), collapse = "\n"))
+    result
   } else {
+    message("Advertencia: Tabla registrador está vacía o no devolvió datos")
     character(0)
   }
 }, error = function(e) {
@@ -133,11 +154,16 @@ registrador_choices <- tryCatch({
 })
 
 arte_pesca_choices <- tryCatch({
-  query <- "SELECT CODART, NOMART FROM arte"
+  query <- "SELECT codart, nomart FROM arte ORDER BY nomart"
+  message("Ejecutando consulta para arte: ", query)
   data <- dbGetQuery(pool, query)
+  message("Datos obtenidos para arte: ", paste(capture.output(str(data)), collapse = "\n"))
   if (nrow(data) > 0) {
-    setNames(data$CODART, data$NOMART)
+    result <- setNames(data$codart, data$nomart)
+    message("Contenido de arte_pesca_choices: ", paste(capture.output(str(result)), collapse = "\n"))
+    result
   } else {
+    message("Advertencia: Tabla arte está vacía o no devolvió datos")
     character(0)
   }
 }, error = function(e) {
@@ -146,11 +172,16 @@ arte_pesca_choices <- tryCatch({
 })
 
 sitio_desembarque_choices <- tryCatch({
-  query <- "SELECT CODSIT, NOMSIT FROM sitios"
+  query <- "SELECT codsit, nomsit FROM sitios ORDER BY nomsit"
+  message("Ejecutando consulta para sitios: ", query)
   data <- dbGetQuery(pool, query)
+  message("Datos obtenidos para sitios: ", paste(capture.output(str(data)), collapse = "\n"))
   if (nrow(data) > 0) {
-    setNames(data$CODSIT, data$NOMSIT)
+    result <- setNames(data$codsit, data$nomsit)
+    message("Contenido de sitio_desembarque_choices: ", paste(capture.output(str(result)), collapse = "\n"))
+    result
   } else {
+    message("Advertencia: Tabla sitios está vacía o no devolvió datos")
     character(0)
   }
 }, error = function(e) {
@@ -158,41 +189,76 @@ sitio_desembarque_choices <- tryCatch({
   character(0)
 })
 
+# Cargar opciones para faenas
+message("Cargando opciones para faenas...")
+faena_choices <- tryCatch({
+  query <- "SELECT id, registro FROM faena_principal ORDER BY fecha_zarpe DESC"
+  message("Ejecutando consulta para faenas: ", query)
+  data <- dbGetQuery(pool, query)
+  message("Datos obtenidos para faenas: ", paste(capture.output(str(data)), collapse = "\n"))
+  if (nrow(data) > 0) {
+    result <- setNames(data$id, paste("Faena", data$id, "-", data$registro))
+    message("Contenido de faena_choices: ", paste(capture.output(str(result)), collapse = "\n"))
+    result
+  } else {
+    message("Advertencia: Tabla faena_principal está vacía o no devolvió datos")
+    character(0)
+  }
+}, error = function(e) {
+  message("Error al cargar faenas: ", e$message)
+  character(0)
+})
+
+# Verificación adicional para evitar NULL
+if (is.null(faena_choices)) {
+  faena_choices <- character(0)
+  message("faena_choices era NULL, asignado como character(0) por seguridad")
+}
+
+# Cargar opciones para especies (usadas en varios módulos)
+especie_choices <- tryCatch({
+  query <- "SELECT codesp, nombre_comun FROM especies ORDER BY nombre_comun"
+  message("Ejecutando consulta para especies: ", query)
+  data <- dbGetQuery(pool, query)
+  message("Datos obtenidos para especies: ", paste(capture.output(str(data)), collapse = "\n"))
+  if (nrow(data) > 0) {
+    result <- setNames(data$codesp, data$nombre_comun)
+    message("Contenido de especie_choices: ", paste(capture.output(str(result)), collapse = "\n"))
+    result
+  } else {
+    message("Advertencia: Tabla especies está vacía o no devolvió datos")
+    character(0)
+  }
+}, error = function(e) {
+  message("Error al cargar especies: ", e$message)
+  character(0)
+})
+
 # Cargar todos los módulos
+message("Cargando módulos...")
+# Cargar los archivos del módulo Tabla de referencia
 source("modules/ref_tables_fields.R")
 source("modules/ref_tables_ui.R")
 source("modules/ref_tables_server.R")
+# Cargar los archivos del módulo Ingresi de Datos
 source("modules/ingreso_datos/captura_esfuerzo_ui.R")
 source("modules/ingreso_datos/captura_esfuerzo_server.R")
 source("modules/ingreso_datos/actividad_diaria_ui.R")
 source("modules/ingreso_datos/actividad_diaria_server.R")
-
-# Verificar que se hayan creado las tablas necesarias para el módulo de actividad diaria
-conn <- poolCheckout(pool)
-tryCatch({
-  # Verificar si existe la tabla de actividades_diarias
-  table_exists <- dbExistsTable(conn, "actividades_diarias")
-  if (!table_exists) {
-    # Crear la tabla si no existe
-    query <- "
-      CREATE TABLE IF NOT EXISTS actividades_diarias (
-        id SERIAL PRIMARY KEY,
-        fecha DATE NOT NULL,
-        registrador VARCHAR(10) REFERENCES registrador(CODREG),
-        arte_pesca VARCHAR(10) REFERENCES arte(CODART),
-        sitio VARCHAR(10) REFERENCES sitios(CODSIT),
-        embarcaciones_activas INTEGER DEFAULT 0,
-        embarcaciones_muestreadas INTEGER DEFAULT 0,
-        observaciones TEXT,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      )
-    "
-    dbExecute(conn, query)
-    message("Tabla actividades_diarias creada correctamente")
-  }
-}, error = function(e) {
-  message("Error al verificar/crear tabla actividades_diarias: ", e$message)
-}, finally = {
-  poolReturn(conn)
-})
+source("modules/ingreso_datos/frecuencia_tallas_ui.R")
+source("modules/ingreso_datos/frecuencia_tallas_server.R")
+# Cargar todos los archivos del módulo Verificación de Datos
+source("modules/verificacion/verificacion_datos_ui.R")
+source("modules/verificacion/verificacion_datos_server.R")
+source("modules/verificacion/verificacion_registros_faenas_ui.R")
+source("modules/verificacion/verificacion_registros_faenas_server.R")
+source("modules/verificacion/verificacion_capturas_desproporcionadas_ui.R")
+source("modules/verificacion/verificacion_capturas_desproporcionadas_server.R")
+source("modules/verificacion/verificacion_tallas_desproporcionadas_ui.R")
+source("modules/verificacion/verificacion_tallas_desproporcionadas_server.R")
+source("modules/verificacion/verificacion_faenas_largas_ui.R")
+source("modules/verificacion/verificacion_faenas_largas_server.R")
+# Cargar los archivos del módulo Procesamiento de Datos
+source("modules/procesamiento/procesamiento_datos_ui.R")
+source("modules/procesamiento/procesamiento_datos_server.R")
+message("Módulos cargados con éxito.")

@@ -189,34 +189,35 @@ setup_databases <- function(conn) {
         Fecha_Modificacion TIMESTAMP,
         Sincronizado INTEGER
       )",
-    "CREATE TABLE IF NOT EXISTS faena_principal (
-      id SERIAL PRIMARY KEY,
-      registro VARCHAR(50),
-      fecha_zarpe DATE,
-      fecha_arribo DATE,
-      sitio_desembarque VARCHAR(50),
-      subarea VARCHAR(50),
-      registrador VARCHAR(50),
-      embarcacion VARCHAR(50),
-      pescadores INTEGER,
-      hora_salida TIME,
-      hora_arribo TIME,
-      horario VARCHAR(50),
-      galones NUMERIC,
-      artepesca VARCHAR(50),
-      metodopesca VARCHAR(50),
-      motores INTEGER,
-      propulsion VARCHAR(50),
-      potencia NUMERIC,
-      estado_verificacion VARCHAR(50),
-      verificado_por VARCHAR(50),
-      fecha_verificacion TIMESTAMP,
-      creado_por VARCHAR(50),
-      fecha_creacion TIMESTAMP,
-      modificado_por VARCHAR(50),
-      fecha_modificacion TIMESTAMP,
-      sincronizado INTEGER
-    );",
+    "faena_principal" = "
+      CREATE TABLE IF NOT EXISTS faena_principal (
+        id SERIAL PRIMARY KEY,
+        registro VARCHAR(50),
+        fecha_zarpe DATE,
+        fecha_arribo DATE,
+        sitio_desembarque VARCHAR(50),
+        subarea VARCHAR(50),
+        registrador VARCHAR(50),
+        embarcacion VARCHAR(50),
+        pescadores INTEGER,
+        hora_salida TIME,
+        hora_arribo TIME,
+        horario VARCHAR(50),
+        galones NUMERIC,
+        artepesca VARCHAR(50),
+        metodopesca VARCHAR(50),
+        motores INTEGER,
+        propulsion VARCHAR(50),
+        potencia NUMERIC,
+        estado_verificacion VARCHAR(50),
+        verificado_por VARCHAR(50),
+        fecha_verificacion TIMESTAMP,
+        creado_por VARCHAR(50),
+        fecha_creacion TIMESTAMP,
+        modificado_por VARCHAR(50),
+        fecha_modificacion TIMESTAMP,
+        sincronizado INTEGER
+      )",
     "detalles_captura" = "
       CREATE TABLE IF NOT EXISTS detalles_captura (
         ID SERIAL PRIMARY KEY,
@@ -290,48 +291,112 @@ setup_databases <- function(conn) {
         Sincronizado INTEGER
       )",
     "observaciones" = "
-    CREATE TABLE IF NOT EXISTS observaciones (
-      id SERIAL PRIMARY KEY,
-      faena_id INTEGER,
-      observacion TEXT,
-      creado_por VARCHAR(50),
-      fecha_creacion TIMESTAMP,
-      modificado_por VARCHAR(50),
-      fecha_modificacion TIMESTAMP,
-      sincronizado INTEGER,
-      CONSTRAINT fk_observaciones_faena
-        FOREIGN KEY (faena_id)
-        REFERENCES faena_principal (id)
-        ON DELETE CASCADE
-    )",
+      CREATE TABLE IF NOT EXISTS observaciones (
+        id SERIAL PRIMARY KEY,
+        faena_id INTEGER,
+        observacion TEXT,
+        creado_por VARCHAR(50),
+        fecha_creacion TIMESTAMP,
+        modificado_por VARCHAR(50),
+        fecha_modificacion TIMESTAMP,
+        sincronizado INTEGER,
+        CONSTRAINT fk_observaciones_faena
+          FOREIGN KEY (faena_id)
+          REFERENCES faena_principal (id)
+          ON DELETE CASCADE
+      )",
     "actividades_diarias" = "
-CREATE TABLE IF NOT EXISTS actividades_diarias (
-  id SERIAL PRIMARY KEY,
-  fecha DATE NOT NULL,
-  registrador_id VARCHAR(10) NOT NULL,
-  arte_pesca_id VARCHAR(10) NOT NULL,
-  zona_desembarco_id VARCHAR(10) NOT NULL,
-  num_embarcaciones_activas INTEGER NOT NULL,
-  num_embarcaciones_muestreadas INTEGER NOT NULL,
-  observaciones TEXT,
-  creado_por VARCHAR(50),
-  fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  modificado_por VARCHAR(50),
-  fecha_modificacion TIMESTAMP,
-  sincronizado INTEGER DEFAULT 0,
-  CONSTRAINT fk_registrador_act
-    FOREIGN KEY (registrador_id)
-    REFERENCES registrador (CODREG)
-    ON DELETE RESTRICT,
-  CONSTRAINT fk_arte_pesca_act
-    FOREIGN KEY (arte_pesca_id)
-    REFERENCES arte (CODART)
-    ON DELETE RESTRICT,
-  CONSTRAINT fk_zona_desembarco_act
-    FOREIGN KEY (zona_desembarco_id)
-    REFERENCES sitios (CODSIT)
-    ON DELETE RESTRICT
-)"
+      CREATE TABLE IF NOT EXISTS actividades_diarias (
+        id SERIAL PRIMARY KEY,
+        fecha DATE NOT NULL,
+        registrador_id VARCHAR(10) NOT NULL,
+        arte_pesca_id VARCHAR(10) NOT NULL,
+        zona_desembarco_id VARCHAR(10) NOT NULL,
+        num_embarcaciones_activas INTEGER NOT NULL,
+        num_embarcaciones_muestreadas INTEGER NOT NULL,
+        observaciones TEXT,
+        creado_por VARCHAR(50),
+        fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        modificado_por VARCHAR(50),
+        fecha_modificacion TIMESTAMP,
+        sincronizado INTEGER DEFAULT 0,
+        CONSTRAINT fk_registrador_act
+          FOREIGN KEY (registrador_id)
+          REFERENCES registrador (CODREG)
+          ON DELETE RESTRICT,
+        CONSTRAINT fk_arte_pesca_act
+          FOREIGN KEY (arte_pesca_id)
+          REFERENCES arte (CODART)
+          ON DELETE RESTRICT,
+        CONSTRAINT fk_zona_desembarco_act
+          FOREIGN KEY (zona_desembarco_id)
+          REFERENCES sitios (CODSIT)
+          ON DELETE RESTRICT
+      )",
+    
+    # Tabla frecuencia_tallas (nueva definición)
+    "frecuencia_tallas" = "
+      ID SERIAL PRIMARY KEY,
+        Faena_ID INTEGER NOT NULL,
+        Especie_ID VARCHAR(10) NOT NULL,
+        Tipo_Medida VARCHAR(50) NOT NULL CHECK (Tipo_Medida IN ('Longitud Total', 'Longitud Estándar', 'Longitud Horquilla', 'Longitud Cefalotórax', 'Longitud Cola', 'Longitud Concha')),
+        Talla DECIMAL NOT NULL CHECK (Talla > 0),
+        Frecuencia INTEGER NOT NULL CHECK (Frecuencia > 0),
+        Peso DECIMAL CHECK (Peso IS NULL OR Peso > 0),
+        Sexo VARCHAR(10) CHECK (Sexo IS NULL OR Sexo IN ('H Hembra', 'M Macho', 'I Indefinido')),
+        Creado_Por VARCHAR(50),
+        Fecha_Creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        Modificado_Por VARCHAR(50),
+        Fecha_Modificacion TIMESTAMP,
+        Sincronizado INTEGER DEFAULT 0,
+        CONSTRAINT fk_faena_tallas
+          FOREIGN KEY (Faena_ID)
+          REFERENCES faena_principal (ID)
+          ON DELETE CASCADE,
+        CONSTRAINT fk_especie_tallas
+          FOREIGN KEY (Especie_ID)
+          REFERENCES especies (CODESP)
+          ON DELETE RESTRICT
+      )",
+    # Tabla para almacenar reportes de estadísticas
+    "reporte_estadisticas" = "
+      CREATE TABLE IF NOT EXISTS reporte_estadisticas (
+        id SERIAL PRIMARY KEY,
+      fecha_inicio DATE NOT NULL,
+      fecha_fin DATE NOT NULL,
+      especie_id VARCHAR(10),
+      sitio_id VARCHAR(10),
+      especie VARCHAR(100),
+      num_registros INTEGER,
+      total_individuos INTEGER,
+      total_peso_kg NUMERIC,
+      sitio VARCHAR(100),
+      nombre_sitio VARCHAR(100),
+      num_faenas INTEGER,
+      creado_por VARCHAR(50),
+      fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )",
+    # Tabla para almacenar reportes de estimaciones
+    "reporte_estimaciones" = "
+      CREATE TABLE IF NOT EXISTS reporte_estimaciones (
+      id SERIAL PRIMARY KEY,
+      fecha_inicio DATE NOT NULL,
+      fecha_fin DATE NOT NULL,
+      especie_id VARCHAR(10),
+      sitio_id VARCHAR(10),
+      fecha DATE,
+      sitio VARCHAR(100),
+      nombre_sitio VARCHAR(100),
+      especie VARCHAR(100),
+      num_embarcaciones_activas INTEGER,
+      num_embarcaciones_muestreadas INTEGER,
+      indv_muestreados INTEGER,
+      peso_muestreados_kg NUMERIC,
+      indv_estimados NUMERIC,
+      peso_estimados_kg NUMERIC,
+      creado_por VARCHAR(50),
+      fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )"
   )
   
   # Función para extraer columnas de una definición SQL

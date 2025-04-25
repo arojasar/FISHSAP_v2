@@ -1,4 +1,5 @@
 # ui.R
+
 library(shiny)
 library(shinydashboard)
 library(bslib)
@@ -31,8 +32,11 @@ ui <- dashboardPage(
       ),
       menuItem("Ingreso de Datos", tabName = "principal", icon = icon("edit"),
                menuSubItem("Captura y Esfuerzo", tabName = "captura_esfuerzo"),
-               menuSubItem("Actividad Diaria", tabName = "actividad_diaria")
-      )
+               menuSubItem("Actividad Diaria", tabName = "actividad_diaria"),
+               menuSubItem("Frecuencia de Tallas", tabName = "frecuencia_tallas")
+      ),
+      menuItem("Verificación de Datos", tabName = "verificacion_datos", icon = icon("check")),
+      menuItem("Procesamiento de Datos", tabName = "procesamiento_datos", icon = icon("chart-bar"))
     )
   ),
   dashboardBody(
@@ -46,7 +50,9 @@ ui <- dashboardPage(
                   p("Utiliza el menú lateral para navegar entre las diferentes secciones:"),
                   tags$ul(
                     tags$li("Tablas de Referencia: Gestiona los datos maestros como sitios, especies, y categorías."),
-                    tags$li("Ingreso de Datos: Registra la información de las faenas pesqueras y actividades diarias.")
+                    tags$li("Ingreso de Datos: Registra la información de las faenas pesqueras y actividades diarias."),
+                    tags$li("Verificación de Datos: Revisa y corrige posibles inconsistencias en los datos."),
+                    tags$li("Procesamiento de Datos: Genera estadísticas y estimaciones basadas en los datos registrados.")
                   ),
                   h3("Acerca de"),
                   p("Desarrollado para apoyar la gestión pesquera sostenible en el Archipiélago de San Andrés. Si tienes preguntas o necesitas soporte, contacta al equipo de desarrollo.")
@@ -133,6 +139,20 @@ ui <- dashboardPage(
       tabItem(tabName = "actividad_diaria",
               h2("Registro de Actividad Diaria"),
               actividad_diaria_ui("actividad_diaria")
+      ),
+      tabItem(tabName = "frecuencia_tallas",
+              h2("Frecuencia de Tallas"),
+              frecuencia_tallas_ui("frecuencia_tallas")
+      ),
+      # Módulo de verificación de datos
+      tabItem(tabName = "verificacion_datos",
+              h2("Verificación de Datos"),
+              verificacion_datos_ui("verificacion_datos")
+      ),
+      # Módulo de procesamiento de datos
+      tabItem(tabName = "procesamiento_datos",
+              h2("Procesamiento de Datos"),
+              procesamiento_datos_ui("procesamiento_datos")
       )
     )
   )
